@@ -8004,15 +8004,18 @@ CREATE DEFINER=`setienne`@`localhost` PROCEDURE `ctm_proc_purge_pending_removal`
     NO SQL
 BEGIN
 
-START TRANSACTION;
+-- START TRANSACTION;
+
+/*delete from ctm_bank_transact_validate
+WHERE bank_transact_id  in (select bank_transact_id from bobbylog_bank_transaction_db.ctm_pending_removal WHERE t_status='U');
+*/
 
 delete from ctm_bank_transact_validate
-WHERE bank_transact_id  in (select bank_transact_id from bobbylog_bank_transaction_db.ctm_pending_removal WHERE t_status='U');
+where datediff(CURRENT_DATE,transactdate)>5 AND validation_status=0;
+
+-- COMMIT;
 
 
-
-COMMIT;
- 
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -11067,4 +11070,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-12-30 20:52:56
+-- Dump completed on 2021-12-31 21:37:43
