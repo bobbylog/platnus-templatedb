@@ -3184,7 +3184,7 @@ DELIMITER ;;
 /*!50003 SET sql_mode              = 'NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;;
 /*!50003 SET @saved_time_zone      = @@time_zone */ ;;
 /*!50003 SET time_zone             = 'SYSTEM' */ ;;
-/*!50106 CREATE*/ /*!50117 DEFINER=`setienne`@`localhost`*/ /*!50106 EVENT `ctm_evt_purge_pending_removal` ON SCHEDULE EVERY 1 DAY STARTS '2021-10-01 10:00:00' ON COMPLETION PRESERVE ENABLE DO call purge_pending_removal() */ ;;
+/*!50106 CREATE*/ /*!50117 DEFINER=`setienne`@`localhost`*/ /*!50106 EVENT `ctm_evt_purge_pending_removal` ON SCHEDULE EVERY 1 DAY STARTS '2021-10-01 10:00:00' ON COMPLETION PRESERVE ENABLE DO call ctm_proc_purge_pending_removal() */ ;;
 /*!50003 SET time_zone             = @saved_time_zone */ ;;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;;
@@ -7483,6 +7483,14 @@ INSERT INTO `ctm_group` (`groupid`, `groupname`, `description`, `profileid`) VAL
 (1, 'budgetadmins', 'Budget Administrators',(select profileid from ctm_profile where profile_initial=p_init limit 1)),
 (2, 'budgetusers', 'Budget Users',  (select profileid from ctm_profile where profile_initial=p_init limit 1));
 
+INSERT INTO `ctm_user_group` (`userid`, `groupid`) VALUES
+((select userid from ctm_user where username='budgetadmin' limit 1) ,1);
+
+INSERT INTO `ctm_user_group` (`userid`, `groupid`) VALUES
+((select userid from ctm_user where username='budgetuser' limit 1),2);
+
+
+
 INSERT INTO `ctm_suscription`(`userid`, `planid`, `startdate`, `enddate`, `status`, `psbridgeid`, `profileid`, `susctype`, `suscskey`) 
 SELECT 'budgetadmin', submit_planid,CURRENT_TIMESTAMP,
 CASE 
@@ -8011,7 +8019,7 @@ WHERE bank_transact_id  in (select bank_transact_id from bobbylog_bank_transacti
 */
 
 delete from ctm_bank_transact_validate
-where datediff(CURRENT_DATE,transactdate)>5 AND validation_status=0;
+where datediff(CURRENT_DATE,transactdate)>7 AND validation_status=0;
 
 -- COMMIT;
 
@@ -11070,4 +11078,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-12-31 21:37:43
+-- Dump completed on 2022-01-05  3:06:43
