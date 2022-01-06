@@ -2666,9 +2666,11 @@ DROP TABLE IF EXISTS `ctm_user_group`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `ctm_user_group` (
+  `usergroupid` int(11) NOT NULL AUTO_INCREMENT,
   `userid` int(11) DEFAULT NULL,
-  `groupid` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  `groupid` int(11) DEFAULT NULL,
+  PRIMARY KEY (`usergroupid`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -11078,4 +11080,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-01-05  3:06:43
+-- Dump completed on 2022-01-06  3:35:52
