@@ -4208,7 +4208,16 @@ ELSEIF p_PMonth='dec' THEN set Moval=12;
      
 END IF;      
 
-  SET res = (select sum(Amount) from ctm_expense where YEAR(TransDate)=(select report_year from ctm_dashboard_settings limit 1) and MONTH(TransDate)=Moval and  (exp_options is not null or exp_options<>'') limit 1);
+ SET res=(
+       select sum(Amount) from ctm_expense 
+where YEAR(TransDate)=(select report_year from ctm_dashboard_settings limit 1) 
+and 
+((MONTH(TransDate)=1 and (exp_options is not null and exp_options<>'')) 
+ and left(exp_options,1)=1));
+  
+  /*SET res = (select sum(Amount) from ctm_expense where YEAR(TransDate)=(select report_year from ctm_dashboard_settings limit 1) and MONTH(TransDate)=Moval and  (exp_options is not null or exp_options<>'') limit 1);
+  */
+  
   RETURN res;
 END ;;
 DELIMITER ;
@@ -7078,7 +7087,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`setienne`@`localhost` PROCEDURE `ctm_proc_display_downloaded_transact_from_bank_db`(IN `profid` INT)
+CREATE DEFINER=`setienne`@`localhost` PROCEDURE `ctm_proc_display_downloaded_transact_from_bank_db`(IN `profid` VARCHAR(25))
     NO SQL
 BEGIN
 
@@ -7322,7 +7331,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`setienne`@`localhost` PROCEDURE `ctm_proc_get_downloaded_transact_from_bank_db`(IN `profid` INT)
+CREATE DEFINER=`setienne`@`localhost` PROCEDURE `ctm_proc_get_downloaded_transact_from_bank_db`(IN `profid` VARCHAR(25))
     NO SQL
 BEGIN
 
@@ -7496,7 +7505,8 @@ INSERT INTO `ctm_user_group` (`userid`, `groupid`) VALUES
 INSERT INTO `ctm_suscription`(`userid`, `planid`, `startdate`, `enddate`, `status`, `psbridgeid`, `profileid`, `susctype`, `suscskey`) 
 SELECT 'budgetadmin', submit_planid,CURRENT_TIMESTAMP,
 CASE 
-WHEN submit_planid='Plan30' THEN CURRENT_TIMESTAMP+INTERVAL 30 DAY 
+WHEN submit_planid='Plan30' THEN ''
+-- CURRENT_TIMESTAMP+INTERVAL 30 DAY 
 WHEN submit_planid='PlanMonthly' THEN ''
 WHEN submit_planid='PlanYearly' THEN ''
 END
@@ -7572,7 +7582,7 @@ BEGIN
        
     START TRANSACTION;
     
-    		INSERT INTO `ctm_bank_funder_association` (`association_date`, `bank_account_id`, `bank_accountname`, `bank_accountnumber`, `target_funder_id`, `bank_funder_name`, `target_funder_initial`, `association_status`)  VALUES (CURRENT_DATE, 
+    		INSERT INTO `ctm_bank_funder_association` (`association_date`, `bank_account_id`, `bank_accountname`, `bank_accountnumber`, `target_funder_id`, `target_funder_name`, `target_funder_initial`, `association_status`)  VALUES (CURRENT_DATE, 
                     p_Paccid, 
                     (select accountnickname from bobbylog_bank_transaction_db.downloaded_bank_account where bank_account_id =p_Paccid limit 1), 
                     (select accountlast4num from bobbylog_bank_transaction_db.downloaded_bank_account where bank_account_id =p_Paccid limit 1), 
@@ -8735,18 +8745,24 @@ BEGIN
 			
 	DECLARE v_nc int;
 	DECLARE v_nc1 int;
-	  
-        IF p_Pflag=1 THEN
-            UPDATE ctm_downloaded_transaction_settings SET
-            auto_download=1;
-        ELSE
-            UPDATE ctm_downloaded_transaction_settings SET
-            auto_download=0;
-        END IF;
- 
+    DECLARE res int;
+    
+      set res=(SELECT count(settings_id) from ctm_downloaded_transaction_settings);
+    
+    IF (res>0) THEN
+     
+UPDATE `ctm_downloaded_transaction_settings` SET 
+       auto_download=p_Pflag;
+      
+    ELSE
+    	INSERT INTO `ctm_downloaded_transaction_settings`(`auto_download`) VALUES (p_Pflag);
+    END IF;
+
 set v_nc=FOUND_ROWS(); 
 
 select v_nc as Affected;
+    
+    
 
 
 END ;;
@@ -11080,4 +11096,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-01-06  3:35:52
+-- Dump completed on 2022-01-07 19:47:03
