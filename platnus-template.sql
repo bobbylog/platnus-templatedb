@@ -2670,7 +2670,7 @@ CREATE TABLE `ctm_user_group` (
   `userid` int(11) DEFAULT NULL,
   `groupid` int(11) DEFAULT NULL,
   PRIMARY KEY (`usergroupid`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3086,7 +3086,7 @@ DELIMITER ;;
 /*!50003 SET sql_mode              = 'NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;;
 /*!50003 SET @saved_time_zone      = @@time_zone */ ;;
 /*!50003 SET time_zone             = 'SYSTEM' */ ;;
-/*!50106 CREATE*/ /*!50117 DEFINER=`setienne`@`localhost`*/ /*!50106 EVENT `ctm_evt_download_transact` ON SCHEDULE EVERY 4 HOUR STARTS '2020-10-08 00:00:00' ON COMPLETION PRESERVE ENABLE DO call ctm_proc_get_downloaded_transact_from_bank_db(1) */ ;;
+/*!50106 CREATE*/ /*!50117 DEFINER=`setienne`@`localhost`*/ /*!50106 EVENT `ctm_evt_download_transact` ON SCHEDULE EVERY 4 HOUR STARTS '2020-10-08 00:00:00' ON COMPLETION PRESERVE ENABLE DO call ctm_proc_get_downloaded_transact_from_bank_db((SELECT profilename from ctm_profile limit 1)) */ ;;
 /*!50003 SET time_zone             = @saved_time_zone */ ;;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;;
@@ -6436,7 +6436,8 @@ BEGIN
   DECLARe actname_f varchar(350);
   DECLARe actno_f varchar(350);
   DECLARE Lstid_f varchar(25);
-  
+  DECLARE trassign varchar(50);
+    
 DECLARE curTrans 
   CURSOR FOR 
             SELECT batchid, transactaccto, transacttype, amount, batchdate, transactdesc, supplier, transactaccfrom FROM ctm_transact_batch where transauth=1 and processed=0;
@@ -6494,6 +6495,97 @@ call ctm_proc_add_funds_for_income(trto,tramt,Lstid,Budgetident, trid);
        call ctm_proc_withdraw_funds_for_bank_transfer(trfrom, trto,tramt,Lstid,Budgetident, trid);
                    
     END IF;  
+  
+    END LOOP getTrans;
+    CLOSE curTrans;
+
+ 
+    
+
+   END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `ctm_postBatchTransact_new_for_allocation` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`bobbylog`@`localhost` PROCEDURE `ctm_postBatchTransact_new_for_allocation`()
+BEGIN
+ 
+  DECLARE v_nc int;
+  DECLARE nexp int;
+  DECLARE nalloc int;
+  DECLARE ntrans int;
+  DECLARE nbtrans int;
+  DECLARE ninc int;
+  DECLARE finished INTEGER DEFAULT 0;
+  DECLARE trid int;
+  DECLARE trtype varchar(25) DEFAULT "";
+  DECLARE trto varchar(25) DEFAULT "";
+  DECLARE tramt varchar(25) DEFAULT "";
+  DECLARE trdate varchar(25) DEFAULT "";
+  DECLARe CurBal varchar(25);
+  DECLARe trfrom varchar(25);
+  DECLARE Budgetident varchar(25);
+  DECLARe actname varchar(350);
+  DECLARe actno varchar(350);
+  DECLARe trdesc text;
+  DECLARe trsup varchar(350);
+  DECLARE Lstid varchar(25);
+  DECLARE idtrfr int;
+  DECLARE idtrto int;
+  DECLARe CurBal_f varchar(25);
+  DECLARe CurFBal varchar(25);
+  DECLARE Budgetident_f varchar(25);
+  DECLARe actname_f varchar(350);
+  DECLARe actno_f varchar(350);
+  DECLARE Lstid_f varchar(25);
+  DECLARE trassign varchar(50);
+  DECLARE resbatch int;
+  
+  
+     
+DECLARE curTrans 
+  CURSOR FOR 
+            SELECT batchid, transactaccto, transacttype, amount, batchdate, transactdesc, supplier, transactaccfrom FROM ctm_transact_batch where transauth=1 and processed=0 order by batchid desc limit 1;
+ 
+ 	    DECLARE CONTINUE HANDLER 
+        FOR NOT FOUND SET finished = 1;
+  
+   OPEN curTrans;
+ 
+    getTrans: LOOP
+        FETCH curTrans INTO trid, trto, trtype, tramt, trdate, trdesc, trsup, trfrom;
+        IF finished = 1 THEN 
+            LEAVE getTrans;
+        END IF;
+                 
+        
+        set CurBal=getBalance_new(trto);
+        set Budgetident=getBudgetid_new(trto);
+                        set Lstid=getLastBalRefId_new(trto);
+        
+        set CurBal_f=getBalance_new(trfrom);
+        set Budgetident_f=getBudgetid_new(trfrom);
+                        set Lstid_f=getLastBalRefId_new(trfrom);
+        
+        set CurFBal=getFunderBalanceByAccId(trto);
+        
+        
+   IF (trtype='*Void*') THEN
+		call ctm_proc_withdraw_funds_for_expenses(trto,tramt,Lstid,Budgetident, trid);
+         
+    END IF;  
+   
   
     END LOOP getTrans;
     CLOSE curTrans;
@@ -7716,6 +7808,34 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `ctm_proc_prepare_recent_batch` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`setienne`@`localhost` PROCEDURE `ctm_proc_prepare_recent_batch`()
+    NO SQL
+BEGIN
+
+DECLARE resbatch int;
+
+set resbatch=(SELECT batchid from ctm_transact_batch where transauth=0 and processed=0 order by batchid desc limit 1);
+                
+  update ctm_transact_batch set transauth=1 WHERE
+    processed=0 and transauth=0
+     and batchid=resbatch;
+
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 DROP PROCEDURE IF EXISTS `ctm_proc_profile_tmp_Account_Info_Result` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -8208,6 +8328,76 @@ DECLARE curAcct
                         ELSE (PercentRate*SourceBalance)/100 END
                      where SourceAccount=accno;
                      
+                     COMMIT;
+                    
+
+                
+                    
+                
+                 
+    END LOOP getAcct;
+    CLOSE curAcct;
+
+   
+
+ END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `ctm_proc_rebalance_all_account_from_funder_for_bank_transfer` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`bobbylog`@`localhost` PROCEDURE `ctm_proc_rebalance_all_account_from_funder_for_bank_transfer`()
+BEGIN
+
+DECLARE accid varchar(25); 
+DECLARE pperc varchar(25);
+DECLARE prate varchar(25); 
+DECLARE scrbal varchar(25);
+DECLARE scracc varchar(25);
+DECLARE accno varchar(25);
+DECLARE finished integer default 0;
+
+
+DECLARE curAcct
+  CURSOR FOR 
+            select distinct Accountid, AccountNo, ByPercent, FinalBalance from ctm_funder_q_balance_view;
+ 
+ 	    DECLARE CONTINUE HANDLER 
+        FOR NOT FOUND SET finished = 1;
+  
+   OPEN curAcct;
+ 
+    getAcct: LOOP
+        FETCH curAcct INTO  accid, accno, pperc, scrbal;
+        IF finished = 1 THEN 
+            LEAVE getAcct;
+        END IF;
+
+                 
+                     
+                    
+                     START TRANSACTION;
+                     
+                     update ctm_account_new set 
+                        SourceBalance=scrbal
+                                             where SourceAccount=accno;
+                     
+                     
+                     update ctm_account_new set 
+                    balance= case when ByPercent='Yes' THEN 							(IFNULL(activities,0)+(PercentRate*SourceBalance/100)) ELSE Balance END
+                     where SourceAccount=accno;
+                     
+                                                                                                                                      
                      COMMIT;
                     
 
@@ -9395,7 +9585,7 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8mb4 */ ;
 /*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'NO_AUTO_VALUE_ON_ZERO' */ ;
+/*!50003 SET sql_mode              = 'NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
 CREATE DEFINER=`setienne`@`localhost` PROCEDURE `ctm_proc_withdraw_funds_for_bank_transfer`(IN `p_accidfr` VARCHAR(25), IN `p_accid` VARCHAR(25), IN `p_amt` VARCHAR(25), IN `p_ref` VARCHAR(25), IN `p_budid` VARCHAR(25), IN `p_batchid` VARCHAR(25))
     NO SQL
@@ -9444,7 +9634,7 @@ set AccScrfr=(select AccountNo from ctm_funder_new where accountid= p_accidfr);
 set AccScrto=(select AccountNo from ctm_funder_new where accountid= p_accid);                   
 
 
-                  call  ctm_proc_rebalance_accountsource(AccScrfr, p_amt,LAST_INSERT_ID());
+                  call  ctm_proc_rebalance_accountsource(AccScrfr, -p_amt,LAST_INSERT_ID());
                   
                   call  ctm_proc_rebalance_accountsource(AccScrto, p_amt,LAST_INSERT_ID());
                                                          
@@ -10355,7 +10545,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`bobbylog`@`localhost` PROCEDURE `ctm_updateUser`(IN `p_PUID` VARCHAR(25), IN `p_PUname` VARCHAR(50), IN `p_PPassword` VARCHAR(250), IN `p_PPassPhrase` VARCHAR(50), IN `p_PDesc` VARCHAR(250), IN `p_Pprofile` VARCHAR(25), IN `p_PStatus` VARCHAR(25), IN `p_PEmail` VARCHAR(150))
+CREATE DEFINER=`bobbylog`@`localhost` PROCEDURE `ctm_updateUser`(IN `p_PUID` VARCHAR(25), IN `p_PUname` VARCHAR(50), IN `p_PPassword` VARCHAR(250), IN `p_PPassPhrase` VARCHAR(50), IN `p_PDesc` VARCHAR(250), IN `p_Pprofile` VARCHAR(25), IN `p_PStatus` VARCHAR(25), IN `p_PEmail` VARCHAR(150), IN `p_PPrev` VARCHAR(50))
 BEGIN
 			
 	DECLARE v_nc int;
@@ -10363,7 +10553,21 @@ BEGIN
 	
 	
     	
+    		 IF p_PPrev='budgetadmin' THEN
+    	
     		UPDATE ctm_user SET
+						username=p_PPrev,
+						password=p_PPassword,
+						passphrase=p_PPassPhrase,
+						description=p_PDesc,
+                        profileid=p_Pprofile,
+                        status=p_PStatus,
+                        uemail=p_PEmail
+			WHERE userid=p_PUID;
+            
+            ELSE
+            
+            UPDATE ctm_user SET
 						username=p_PUname,
 						password=p_PPassword,
 						passphrase=p_PPassPhrase,
@@ -10372,6 +10576,8 @@ BEGIN
                         status=p_PStatus,
                         uemail=p_PEmail
 			WHERE userid=p_PUID;
+            
+            END IF;
             
 
 set v_nc=FOUND_ROWS(); 
@@ -10607,7 +10813,7 @@ DELIMITER ;
 /*!50001 SET collation_connection      = utf8mb4_unicode_ci */;
 /*!50001 CREATE ALGORITHM=TEMPTABLE */
 /*!50013 DEFINER=`setienne`@`localhost` SQL SECURITY DEFINER */
-/*!50001 VIEW `ctm_bank_account_funder_balance_view` AS select `a`.`association_id` AS `association_id`,`a`.`association_date` AS `association_date`,`a`.`bank_account_id` AS `bank_account_id`,`a`.`bank_accountname` AS `bank_accountname`,`a`.`bank_accountnumber` AS `bank_accountnumber`,`a`.`target_funder_id` AS `target_funder_id`,`a`.`target_funder_name` AS `bank_funder_name`,`a`.`association_status` AS `association_status`,`a`.`bank_accountlocation` AS `bank_accountlocation`,`b`.`balance_current` AS `balance_current`,`b`.`balance_available` AS `balance_available` from (`bobbylog_budgetdb_prod`.`ctm_bank_funder_association` `a` join `bobbylog_bank_transaction_db`.`downloaded_bank_account` `b` on((`a`.`bank_account_id` = `b`.`bank_account_id`))) */;
+/*!50001 VIEW `ctm_bank_account_funder_balance_view` AS select `a`.`association_id` AS `association_id`,`a`.`association_date` AS `association_date`,`a`.`bank_account_id` AS `bank_account_id`,`a`.`bank_accountname` AS `bank_accountname`,`a`.`bank_accountnumber` AS `bank_accountnumber`,`a`.`target_funder_id` AS `target_funder_id`,`a`.`target_funder_name` AS `bank_funder_name`,`a`.`association_status` AS `association_status`,`a`.`bank_accountlocation` AS `bank_accountlocation`,`b`.`balance_current` AS `balance_current`,`b`.`balance_available` AS `balance_available` from (`bobbylog_budgetdb_templatev4`.`ctm_bank_funder_association` `a` join `bobbylog_bank_transaction_db`.`downloaded_bank_account` `b` on((`a`.`bank_account_id` = `b`.`bank_account_id`))) */;
 /*!50001 SET character_set_client      = @saved_cs_client */;
 /*!50001 SET character_set_results     = @saved_cs_results */;
 /*!50001 SET collation_connection      = @saved_col_connection */;
@@ -11096,4 +11302,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-01-07 19:47:03
+-- Dump completed on 2022-01-13 22:05:31
