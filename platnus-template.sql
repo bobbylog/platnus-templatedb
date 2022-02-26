@@ -7212,11 +7212,13 @@ IF autod=1 THEN
         bobbylog_bank_transaction_db.downloaded_transaction dt
         INNER JOIN bobbylog_bank_transaction_db.downloaded_bank_account ba
         ON dt.bank_account_id=ba.bank_account_id
-        WHERE transact_status='U' and transact_profile=profid;
+       WHERE dt.transact_status='U' and dt.transact_profile=profid;
+
 
         UPDATE bobbylog_bank_transaction_db.downloaded_transaction SET
         transact_status='P'
-        WHERE transact_status='U';
+        WHERE transact_status='U' and transact_profile=profid;
+
        END; 
 END IF;
 
@@ -7457,11 +7459,13 @@ IF autod=1 THEN
         bobbylog_bank_transaction_db.downloaded_transaction dt
         INNER JOIN bobbylog_bank_transaction_db.downloaded_bank_account ba
         ON dt.bank_account_id=ba.bank_account_id
-        WHERE transact_status='U' and transact_profile=profid;
+        WHERE dt.transact_status='U' and dt.transact_profile=profid;
+
 
         UPDATE bobbylog_bank_transaction_db.downloaded_transaction SET
         transact_status='P'
-        WHERE transact_status='U';
+        WHERE transact_status='U' and transact_profile=profid;
+
 	END;
 END IF;
 
@@ -7583,7 +7587,7 @@ INSERT INTO `ctm_fyear` (`profileid`, `yaccronym`, `fyear`, `startdate`, `enddat
     'Active', '');
 
 INSERT INTO `ctm_group` (`groupid`, `groupname`, `description`, `profileid`) VALUES
-(1, 'budgetadmins', 'Budget Administrators',(select profileid from ctm_profile where profile_initial=p_init limit 1)),
+(1, 'budgetadmins', 'Power Users',(select profileid from ctm_profile where profile_initial=p_init limit 1)),
 (2, 'budgetusers', 'Budget Users',  (select profileid from ctm_profile where profile_initial=p_init limit 1));
 
 INSERT INTO `ctm_user_group` (`userid`, `groupid`) VALUES
@@ -10474,8 +10478,8 @@ BEGIN
     	
     		UPDATE ctm_user_group SET
 						userid=p_PUID,
-						groupid=p_PGID,
-                        profileid=p_Pprofile
+						groupid=p_PGID
+                       --  profileid=p_Pprofile
 			WHERE userid=p_PUID;
             
 
@@ -11302,4 +11306,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-01-13 22:05:31
+-- Dump completed on 2022-02-26  0:26:49
