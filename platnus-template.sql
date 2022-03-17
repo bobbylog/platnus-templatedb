@@ -16,6 +16,106 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `_tmp_account_new`
+--
+
+DROP TABLE IF EXISTS `_tmp_account_new`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `_tmp_account_new` (
+  `tmp_row_id` int(11) NOT NULL AUTO_INCREMENT,
+  `Accountid` int(11) DEFAULT '0',
+  `Budgetid` varchar(50) CHARACTER SET latin1 DEFAULT NULL,
+  `AccountNo` varchar(350) CHARACTER SET latin1 DEFAULT NULL,
+  `CreatedBy` varchar(50) CHARACTER SET latin1 DEFAULT NULL,
+  `CreationDate` varchar(50) CHARACTER SET latin1 DEFAULT NULL,
+  `ClosingDate` varchar(50) CHARACTER SET latin1 DEFAULT NULL,
+  `AccountName` varchar(350) CHARACTER SET latin1 DEFAULT NULL,
+  `AccountType` varchar(50) CHARACTER SET latin1 DEFAULT NULL,
+  `InitialAmount` varchar(50) CHARACTER SET latin1 DEFAULT NULL,
+  `ByPercent` varchar(50) CHARACTER SET latin1 DEFAULT NULL,
+  `PercentRate` varchar(50) CHARACTER SET latin1 DEFAULT NULL,
+  `Currency` varchar(50) CHARACTER SET latin1 DEFAULT NULL,
+  `SourceAccount` varchar(50) CHARACTER SET latin1 DEFAULT NULL,
+  `Location` varchar(50) CHARACTER SET latin1 DEFAULT NULL,
+  `accStatus` varchar(50) CHARACTER SET latin1 DEFAULT NULL,
+  `aOrder` varchar(50) CHARACTER SET latin1 DEFAULT NULL,
+  `CostCenter` varchar(25) CHARACTER SET latin1 DEFAULT NULL,
+  `ModifiedBy` varchar(50) CHARACTER SET latin1 DEFAULT NULL,
+  `ModifiedDate` varchar(25) CHARACTER SET latin1 DEFAULT NULL,
+  `Comments` text CHARACTER SET latin1,
+  `activities` varchar(25) DEFAULT NULL,
+  `Balance` varchar(25) DEFAULT NULL,
+  `SourceBalance` varchar(25) DEFAULT NULL,
+  `aTarget` varchar(25) DEFAULT NULL,
+  `aReached` varchar(2) DEFAULT NULL,
+  `Pending` varchar(25) NOT NULL,
+  `LastBalRefID` varchar(25) DEFAULT NULL,
+  `Latest_Balance` varchar(25) DEFAULT NULL,
+  PRIMARY KEY (`tmp_row_id`),
+  UNIQUE KEY `AccountNo` (`AccountNo`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `_tmp_account_new`
+--
+
+LOCK TABLES `_tmp_account_new` WRITE;
+/*!40000 ALTER TABLE `_tmp_account_new` DISABLE KEYS */;
+/*!40000 ALTER TABLE `_tmp_account_new` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `_tmp_funder_new`
+--
+
+DROP TABLE IF EXISTS `_tmp_funder_new`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `_tmp_funder_new` (
+  `tmp_row_id` int(11) NOT NULL AUTO_INCREMENT,
+  `Accountid` int(11) DEFAULT '0',
+  `Budgetid` varchar(50) CHARACTER SET latin1 DEFAULT NULL,
+  `ctyearid` int(11) DEFAULT NULL,
+  `AccountNo` varchar(350) CHARACTER SET latin1 DEFAULT NULL,
+  `CreatedBy` varchar(50) CHARACTER SET latin1 DEFAULT NULL,
+  `CreationDate` varchar(50) CHARACTER SET latin1 DEFAULT NULL,
+  `ClosingDate` varchar(50) CHARACTER SET latin1 DEFAULT NULL,
+  `AccountName` varchar(350) CHARACTER SET latin1 DEFAULT NULL,
+  `AccountType` varchar(50) CHARACTER SET latin1 DEFAULT NULL,
+  `InitialAmount` varchar(50) CHARACTER SET latin1 DEFAULT NULL,
+  `ByPercent` varchar(50) CHARACTER SET latin1 DEFAULT NULL,
+  `PercentRate` varchar(50) CHARACTER SET latin1 DEFAULT NULL,
+  `Currency` varchar(50) CHARACTER SET latin1 DEFAULT NULL,
+  `SourceAccount` varchar(50) CHARACTER SET latin1 DEFAULT NULL,
+  `Location` varchar(50) CHARACTER SET latin1 DEFAULT NULL,
+  `accStatus` varchar(50) CHARACTER SET latin1 DEFAULT NULL,
+  `aOrder` varchar(50) CHARACTER SET latin1 DEFAULT NULL,
+  `CostCenter` varchar(25) CHARACTER SET latin1 DEFAULT NULL,
+  `AssignedTo` varchar(50) CHARACTER SET latin1 DEFAULT NULL,
+  `Owner` varchar(50) CHARACTER SET latin1 DEFAULT NULL,
+  `ModifiedBy` varchar(50) CHARACTER SET latin1 DEFAULT NULL,
+  `ModifiedDate` varchar(25) CHARACTER SET latin1 DEFAULT NULL,
+  `Comments` varchar(50) CHARACTER SET latin1 DEFAULT NULL,
+  `Balance` varchar(25) DEFAULT NULL,
+  `FinalBalance` varchar(25) DEFAULT NULL,
+  `LastBalRefID` varchar(25) DEFAULT NULL,
+  PRIMARY KEY (`tmp_row_id`),
+  UNIQUE KEY `AccountNo` (`AccountNo`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `_tmp_funder_new`
+--
+
+LOCK TABLES `_tmp_funder_new` WRITE;
+/*!40000 ALTER TABLE `_tmp_funder_new` DISABLE KEYS */;
+/*!40000 ALTER TABLE `_tmp_funder_new` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `_tmp_mobile_session`
 --
 
@@ -1268,6 +1368,35 @@ CREATE TABLE `ctm_downloaded_transaction_settings` (
 LOCK TABLES `ctm_downloaded_transaction_settings` WRITE;
 /*!40000 ALTER TABLE `ctm_downloaded_transaction_settings` DISABLE KEYS */;
 /*!40000 ALTER TABLE `ctm_downloaded_transaction_settings` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ctm_event_log`
+--
+
+DROP TABLE IF EXISTS `ctm_event_log`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ctm_event_log` (
+  `event_id` int(11) NOT NULL AUTO_INCREMENT,
+  `eventname` varchar(50) DEFAULT NULL,
+  `eventtype` varchar(25) DEFAULT NULL,
+  `event_description` text,
+  `eventdate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `event_ref_module` varchar(25) DEFAULT NULL,
+  `eventstatus` varchar(25) NOT NULL,
+  PRIMARY KEY (`event_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ctm_event_log`
+--
+
+LOCK TABLES `ctm_event_log` WRITE;
+/*!40000 ALTER TABLE `ctm_event_log` DISABLE KEYS */;
+INSERT INTO `ctm_event_log` VALUES (4,'Duplicates','ERROR-DUPLICATE','An account with the same name already exists','2022-03-17 00:44:32','InsertAccount','New');
+/*!40000 ALTER TABLE `ctm_event_log` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -5014,6 +5143,7 @@ BEGIN
  BEGIN
    ROLLBACK;
     set aerr='1062';
+    INSERT into ctm_event_log(eventname,eventtype,event_description,event_ref_module,eventstatus) vALUES("Duplicates","ERROR-DUPLICATE","An account with the same name already exists","InsertAccount","New");
     select 0, aerr as statusc;
  END;
  
@@ -6293,6 +6423,171 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `ctm_insert_tmp_account_new` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`bobbylog`@`localhost` PROCEDURE `ctm_insert_tmp_account_new`(IN `p_PBudgetid` VARCHAR(50), IN `p_PAccountNo` VARCHAR(50), IN `p_PCreationDate` VARCHAR(50), IN `p_PAccountName` VARCHAR(350), IN `p_PInitAmount` VARCHAR(50), IN `p_PByPercent` VARCHAR(25), IN `p_PPercentRate` VARCHAR(25), IN `p_PAccCur` VARCHAR(25), IN `p_PAccSource` VARCHAR(25), IN `p_PLocation` VARCHAR(25), IN `p_PStatus` VARCHAR(25), IN `p_PComments` TEXT, IN `p_PAccounttype` VARCHAR(25), IN `p_POrder` VARCHAR(11), IN `p_PCC` VARCHAR(25), IN `p_PUser` VARCHAR(25), IN `p_PTarget` VARCHAR(25), IN `p_PReached` VARCHAR(2))
+BEGIN
+			
+	DECLARE v_nc int;
+	DECLARE v_nc1 int;
+	DECLARE BalScr VARCHAR(25);
+    DECLARE BudBal Varchar(25);
+    DECLARE aerr varchar(25);
+  
+
+    	
+
+	INSERT INTO _tmp_account_new (
+						Budgetid,
+						AccountNo,
+                        CreatedBy,
+						CreationDate,
+						AccountName,
+						InitialAmount,
+						ByPercent,
+						PercentRate,
+						Currency,
+						SourceAccount,
+						Location,
+						accStatus,
+						Comments,
+                        AccountType,
+                        aOrder,
+                		CostCenter,
+                        Balance,
+    					SourceBalance,
+                        Pending,
+                        aTarget,
+                        aReached,
+                        activities
+                
+				   )
+			 VALUES
+				   (    
+						p_PBudgetid,
+						p_PAccountNo,
+                        p_PUser,
+						CURRENT_TIMESTAMP(),
+						p_PAccountName,
+						p_PInitAmount,
+						p_PByPercent,
+						p_PPercentRate,
+						p_PAccCur,
+						p_PAccSource,
+						p_PLocation,
+						p_PStatus,
+						p_PComments,
+                       p_PAccounttype,
+                       p_POrder,
+                       p_PCC,
+                       IFNULL(BalScr,0),
+                       getSourceBalance_new(p_PAccSource),
+					   '0',
+                       p_PTarget,
+                       p_Preached,
+                       '0'
+					);
+
+
+
+
+set v_nc=FOUND_ROWS(); 
+select v_nc as Affected;
+
+
+
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `ctm_insert_tmp_Funder_new` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`bobbylog`@`localhost` PROCEDURE `ctm_insert_tmp_Funder_new`(IN `p_PBudgetid` VARCHAR(50), IN `p_PYear` VARCHAR(50), IN `p_PAccountNo` VARCHAR(50), IN `p_PCreationDate` VARCHAR(50), IN `p_PAccountName` VARCHAR(350), IN `p_PInitAmount` VARCHAR(50), IN `p_PByPercent` VARCHAR(25), IN `p_PPercentRate` VARCHAR(25), IN `p_PAccCur` VARCHAR(25), IN `p_PAccSource` VARCHAR(25), IN `p_PLocation` VARCHAR(25), IN `p_PStatus` VARCHAR(25), IN `p_PComments` VARCHAR(350), IN `p_PAccounttype` VARCHAR(25), IN `p_POrder` VARCHAR(11), IN `p_POwner` VARCHAR(50), IN `p_PAssign` VARCHAR(50), IN `p_PUser` VARCHAR(50))
+BEGIN
+			
+	DECLARE v_nc int;
+	DECLARE v_nc1 int;
+	
+       
+    		INSERT INTO _tmp_funder_new (
+						Budgetid,
+                        ctyearid,
+						AccountNo,
+                        CreatedBy,
+						CreationDate,
+						AccountName,
+						InitialAmount,
+						ByPercent,
+						PercentRate,
+						Currency,
+						SourceAccount,
+						Location,
+						accStatus,
+						Comments,
+                        AccountType,
+                        aOrder,
+                        AssignedTo,
+                        Owner, 
+                        Balance,
+                        FinalBalance
+                                
+				   )
+			 VALUES
+				   (    
+						p_PBudgetid,
+                        p_PYear,
+						p_PAccountNo,
+                        p_PUser,
+						CURRENT_TIMESTAMP(),
+						p_PAccountName,
+						p_PInitAmount,
+						'No',
+						'0',
+						p_PAccCur,
+						p_PAccSource,
+						p_PLocation,
+						p_PStatus,
+						p_PComments,
+                       p_PAccounttype,
+                       p_POrder,
+                       p_PAssign,
+                       p_POwner,
+                       0,
+					   IFNULL(p_PInitAmount,0)
+					);
+
+
+
+set v_nc=FOUND_ROWS(); 
+select v_nc as Affected;
+
+
+
+
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 DROP PROCEDURE IF EXISTS `ctm_postBatchTransact` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -6463,7 +6758,18 @@ DECLARE curTrans
                         set Lstid_f=getLastBalRefId_new(trfrom);
         
         set CurFBal=getFunderBalanceByAccId(trto);
-        
+   
+   IF (trtype='New Account') THEN
+   
+      call ctm_proc_process_new_account_line_item (trto,trid);
+         
+   END IF;  
+   
+   IF (trtype='New Funder') THEN
+   
+      call ctm_proc_process_new_funder_item (trto,trid);
+         
+   END IF;  
         
    IF (trtype='Expense' or trtype='*Void*') THEN
 		call ctm_proc_withdraw_funds_for_expenses(trto,tramt,Lstid,Budgetident, trid);
@@ -7834,6 +8140,132 @@ set resbatch=(SELECT batchid from ctm_transact_batch where transauth=0 and proce
     processed=0 and transauth=0
      and batchid=resbatch;
 
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `ctm_proc_process_new_account_line_item` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`setienne`@`localhost` PROCEDURE `ctm_proc_process_new_account_line_item`(IN `p_accid` VARCHAR(25), IN `p_batchid` VARCHAR(25))
+    NO SQL
+BEGIN
+DECLARE AccScr varchar(25);
+DECLARE v_nc int;
+DECLARE PrevBal varchar(25);
+
+
+
+START TRANSACTION;
+
+        SELECT 
+        Budgetid, 
+        AccountNo, 
+        CreationDate, 
+        AccountName, 
+        InitialAmount , 
+        ByPercent, 
+        PercentRate, 
+        Currency, 
+        SourceAccount, 
+        Location,
+        accStatus,
+        Comments,
+        AccountType,
+        aOrder,
+        CostCenter,
+        CreatedBy, 
+        aTarget, 
+        aReached   
+        INTO @var1, @var2,@var3,@var4, @var5,@var6,@var7, @var8,@var9,@var10, @var11,@var12,@var13, @var14,@var15,@var16, @var17,@var18  from _tmp_account_new WHERE AccountNo=p_accid limit 1;
+       
+       
+  	call ctm_insertAccount_new(@var1,@var2,@var3,@var4,@var5,@var6,@var7,@var8,@var9,@var10,@var11,@var12,@var13,@var14,@var15,@var16,@var17,@var18);
+DELETE from _tmp_account_new where AccountNo=p_accid;
+
+set v_nc=FOUND_ROWS(); 
+
+
+
+     
+  COMMIT;                      
+
+                IF  v_nc>0 THEN
+                    update ctm_transact_batch set processed=1 WHERE (transacttype='New Account')  and processed=0 and transauth=1 and batchid=p_batchid;
+                END IF;
+                
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `ctm_proc_process_new_funder_item` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`setienne`@`localhost` PROCEDURE `ctm_proc_process_new_funder_item`(IN `p_accid` VARCHAR(25), IN `p_batchid` VARCHAR(25))
+    NO SQL
+BEGIN
+DECLARE AccScr varchar(25);
+DECLARE v_nc int;
+DECLARE PrevBal varchar(25);
+
+
+
+START TRANSACTION;
+
+        SELECT 
+        Budgetid,
+        ctyearid,
+        AccountNo, 
+        CreationDate, 
+        AccountName, 
+        InitialAmount , 
+        ByPercent, 
+        PercentRate, 
+        Currency, 
+        SourceAccount, 
+        Location,
+        accStatus,
+        Comments,
+        AccountType,
+        aOrder,
+        Owner,
+        AssignedTo, 
+        CreatedBy
+        INTO @var1, @var2,@var3,@var4, @var5,@var6,@var7, @var8,@var9,@var10, @var11,@var12,@var13, @var14,@var15,@var16, @var17,@var18  from _tmp_funder_new WHERE AccountNo=p_accid limit 1;
+       
+       
+  	call ctm_insertFunder_new(@var1,@var2,@var3,@var4,@var5,@var6,@var7,@var8,@var9,@var10,@var11,@var12,@var13,@var14,@var15,@var16,@var17,@var18);
+DELETE from _tmp_funder_new where AccountNo=p_accid;
+
+set v_nc=FOUND_ROWS(); 
+
+
+
+     
+  COMMIT;                      
+
+                IF  v_nc>0 THEN
+                    update ctm_transact_batch set processed=1 WHERE (transacttype='New Funder')  and processed=0 and transauth=1 and batchid=p_batchid;
+                END IF;
+                
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -11306,4 +11738,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-02-26  0:26:49
+-- Dump completed on 2022-03-17  0:55:11
