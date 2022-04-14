@@ -54,7 +54,7 @@ CREATE TABLE `_tmp_account_new` (
   `Latest_Balance` varchar(25) DEFAULT NULL,
   PRIMARY KEY (`tmp_row_id`),
   UNIQUE KEY `AccountNo` (`AccountNo`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -103,7 +103,7 @@ CREATE TABLE `_tmp_funder_new` (
   `LastBalRefID` varchar(25) DEFAULT NULL,
   PRIMARY KEY (`tmp_row_id`),
   UNIQUE KEY `AccountNo` (`AccountNo`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -638,6 +638,36 @@ CREATE TABLE `ctm_allocation_archive` (
 LOCK TABLES `ctm_allocation_archive` WRITE;
 /*!40000 ALTER TABLE `ctm_allocation_archive` DISABLE KEYS */;
 /*!40000 ALTER TABLE `ctm_allocation_archive` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ctm_auto_validation_registry`
+--
+
+DROP TABLE IF EXISTS `ctm_auto_validation_registry`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ctm_auto_validation_registry` (
+  `auto_validateid` int(11) NOT NULL AUTO_INCREMENT,
+  `assigned_budgetid` int(11) DEFAULT NULL,
+  `assignedact` int(11) DEFAULT NULL,
+  `assigned_desc` varchar(250) DEFAULT NULL,
+  `assignedsupplier` varchar(100) DEFAULT NULL,
+  `assignedcategory` varchar(25) DEFAULT NULL,
+  `auto_validate_status` varchar(25) DEFAULT NULL,
+  `createdon` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`auto_validateid`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ctm_auto_validation_registry`
+--
+
+LOCK TABLES `ctm_auto_validation_registry` WRITE;
+/*!40000 ALTER TABLE `ctm_auto_validation_registry` DISABLE KEYS */;
+INSERT INTO `ctm_auto_validation_registry` VALUES (1,16,385,'Wegmans','Wegman\'s','Groceries','Active','2022-04-06 13:43:49');
+/*!40000 ALTER TABLE `ctm_auto_validation_registry` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -1397,6 +1427,33 @@ LOCK TABLES `ctm_event_log` WRITE;
 /*!40000 ALTER TABLE `ctm_event_log` DISABLE KEYS */;
 INSERT INTO `ctm_event_log` VALUES (4,'Duplicates','ERROR-DUPLICATE','An account with the same name already exists','2022-03-17 00:44:32','InsertAccount','New');
 /*!40000 ALTER TABLE `ctm_event_log` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ctm_event_witness`
+--
+
+DROP TABLE IF EXISTS `ctm_event_witness`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ctm_event_witness` (
+  `witnessid` int(11) NOT NULL AUTO_INCREMENT,
+  `eventid` int(11) DEFAULT NULL,
+  `dload_witness` int(11) DEFAULT NULL,
+  `rcur_witness` int(11) DEFAULT NULL,
+  `rundate` date NOT NULL,
+  PRIMARY KEY (`witnessid`)
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ctm_event_witness`
+--
+
+LOCK TABLES `ctm_event_witness` WRITE;
+/*!40000 ALTER TABLE `ctm_event_witness` DISABLE KEYS */;
+INSERT INTO `ctm_event_witness` VALUES (11,0,0,0,'2022-04-13');
+/*!40000 ALTER TABLE `ctm_event_witness` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -3215,7 +3272,10 @@ DELIMITER ;;
 /*!50003 SET sql_mode              = 'NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;;
 /*!50003 SET @saved_time_zone      = @@time_zone */ ;;
 /*!50003 SET time_zone             = 'SYSTEM' */ ;;
-/*!50106 CREATE*/ /*!50117 DEFINER=`setienne`@`localhost`*/ /*!50106 EVENT `ctm_evt_download_transact` ON SCHEDULE EVERY 4 HOUR STARTS '2020-10-08 00:00:00' ON COMPLETION PRESERVE ENABLE DO call ctm_proc_get_downloaded_transact_from_bank_db((SELECT profilename from ctm_profile limit 1)) */ ;;
+/*!50106 CREATE*/ /*!50117 DEFINER=`setienne`@`localhost`*/ /*!50106 EVENT `ctm_evt_download_transact` ON SCHEDULE EVERY 4 HOUR STARTS '2020-10-08 00:00:00' ON COMPLETION PRESERVE ENABLE DO BEGIN
+call ctm_proc_get_downloaded_transact_from_bank_db((SELECT profilename from ctm_profile limit 1));
+call ctm_proc_report_event('Download');
+END */ ;;
 /*!50003 SET time_zone             = @saved_time_zone */ ;;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;;
@@ -3315,7 +3375,10 @@ DELIMITER ;;
 /*!50003 SET sql_mode              = 'NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;;
 /*!50003 SET @saved_time_zone      = @@time_zone */ ;;
 /*!50003 SET time_zone             = 'SYSTEM' */ ;;
-/*!50106 CREATE*/ /*!50117 DEFINER=`setienne`@`localhost`*/ /*!50106 EVENT `ctm_evt_purge_pending_removal` ON SCHEDULE EVERY 1 DAY STARTS '2021-10-01 10:00:00' ON COMPLETION PRESERVE ENABLE DO call ctm_proc_purge_pending_removal() */ ;;
+/*!50106 CREATE*/ /*!50117 DEFINER=`setienne`@`localhost`*/ /*!50106 EVENT `ctm_evt_purge_pending_removal` ON SCHEDULE EVERY 1 DAY STARTS '2021-10-01 10:00:00' ON COMPLETION PRESERVE ENABLE DO BEGIN
+call ctm_proc_purge_pending_removal();
+delete from ctm_event_witness; 
+END */ ;;
 /*!50003 SET time_zone             = @saved_time_zone */ ;;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;;
@@ -3339,6 +3402,24 @@ DELIMITER ;;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;;
 /*!50003 SET character_set_results = @saved_cs_results */ ;;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;;
+/*!50106 DROP EVENT IF EXISTS `ctm_evt_purge_witness` */;;
+DELIMITER ;;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;;
+/*!50003 SET character_set_client  = utf8mb4 */ ;;
+/*!50003 SET character_set_results = utf8mb4 */ ;;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;;
+/*!50003 SET sql_mode              = 'NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;;
+/*!50003 SET @saved_time_zone      = @@time_zone */ ;;
+/*!50003 SET time_zone             = 'SYSTEM' */ ;;
+/*!50106 CREATE*/ /*!50117 DEFINER=`setienne`@`localhost`*/ /*!50106 EVENT `ctm_evt_purge_witness` ON SCHEDULE EVERY 1 DAY STARTS '2022-04-06 11:00:00' ON COMPLETION PRESERVE ENABLE DO delete from ctm_event_witness */ ;;
+/*!50003 SET time_zone             = @saved_time_zone */ ;;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;;
+/*!50003 SET character_set_results = @saved_cs_results */ ;;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;;
 /*!50106 DROP EVENT IF EXISTS `ctm_evt_recurring_transfer` */;;
 DELIMITER ;;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;;
@@ -3351,7 +3432,10 @@ DELIMITER ;;
 /*!50003 SET sql_mode              = 'NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;;
 /*!50003 SET @saved_time_zone      = @@time_zone */ ;;
 /*!50003 SET time_zone             = 'SYSTEM' */ ;;
-/*!50106 CREATE*/ /*!50117 DEFINER=`setienne`@`localhost`*/ /*!50106 EVENT `ctm_evt_recurring_transfer` ON SCHEDULE EVERY 1 DAY STARTS '2020-07-13 05:00:00' ON COMPLETION PRESERVE ENABLE DO call ctm_proc_perform_recurring_transfer() */ ;;
+/*!50106 CREATE*/ /*!50117 DEFINER=`setienne`@`localhost`*/ /*!50106 EVENT `ctm_evt_recurring_transfer` ON SCHEDULE EVERY 1 DAY STARTS '2020-07-13 05:00:00' ON COMPLETION PRESERVE ENABLE DO BEGIN
+call ctm_proc_perform_recurring_transfer();
+call ctm_proc_report_event('Recurring');
+END */ ;;
 /*!50003 SET time_zone             = @saved_time_zone */ ;;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;;
@@ -4542,6 +4626,33 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP FUNCTION IF EXISTS `get_autovalidation_status` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`setienne`@`localhost` FUNCTION `get_autovalidation_status`(`p_Pdesc` VARCHAR(250)) RETURNS int(11)
+    NO SQL
+BEGIN
+DECLARE res int;
+
+set res=(SELECT auto_validateid from ctm_auto_validation_registry
+WHERE assigned_desc=p_Pdesc limit 1);
+
+RETURN IFNULL(res,0);
+
+
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 DROP FUNCTION IF EXISTS `translate_login` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -5612,7 +5723,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`bobbylog`@`localhost` PROCEDURE `ctm_insertBudget_new`(IN `p_PSource` VARCHAR(50), IN `p_PScrType` VARCHAR(50), IN `p_PTitle` VARCHAR(350), IN `p_PType` VARCHAR(25), IN `p_PStatus` VARCHAR(25), IN `p_PPlan` VARCHAR(25), IN `p_PAssign` VARCHAR(50), IN `p_Pvision` TEXT, IN `p_PFyear` VARCHAR(50), IN `p_PGroup` VARCHAR(50), IN `p_PCode` VARCHAR(25), IN `p_PYearid` VARCHAR(25), IN `p_POwner` VARCHAR(50), IN `p_PStartd` VARCHAR(25), IN `p_PFollow` TEXT, IN `p_PUser` VARCHAR(50))
+CREATE DEFINER=`bobbylog`@`localhost` PROCEDURE `ctm_insertBudget_new`(IN `p_PSource` VARCHAR(50), IN `p_PScrType` VARCHAR(50), IN `p_PTitle` VARCHAR(350), IN `p_PType` VARCHAR(25), IN `p_PStatus` VARCHAR(25), IN `p_PNote` TEXT, IN `p_PAssign` VARCHAR(50), IN `p_Pvision` TEXT, IN `p_PFyear` VARCHAR(50), IN `p_PGroup` VARCHAR(50), IN `p_PCode` VARCHAR(25), IN `p_PYearid` VARCHAR(25), IN `p_POwner` VARCHAR(50), IN `p_PStartd` VARCHAR(25), IN `p_PFollow` TEXT, IN `p_PUser` VARCHAR(50))
 BEGIN
 			
 	DECLARE v_nc int;
@@ -5654,7 +5765,7 @@ BEGIN
 						p_PTitle,
                         p_PCode,
 						p_PStatus,
-						'NA',
+						p_PNote,
                        p_PAssign,
                        p_Pvision,
                        p_PFyear,
@@ -7253,9 +7364,9 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8mb4 */ ;
 /*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'NO_AUTO_VALUE_ON_ZERO' */ ;
+/*!50003 SET sql_mode              = 'NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`bobbylog`@`localhost` PROCEDURE `ctm_proc_approvebudget_new`(IN `p_budid` VARCHAR(25), IN `p_PUser` VARCHAR(25))
+CREATE DEFINER=`bobbylog`@`localhost` PROCEDURE `ctm_proc_approvebudget_new`(IN `p_budid` VARCHAR(25), IN `p_PUser` VARCHAR(50))
     NO SQL
 BEGIN
 	
@@ -7274,6 +7385,34 @@ COMMIT;
 
 
     
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `ctm_proc_auto_validate` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`setienne`@`localhost` PROCEDURE `ctm_proc_auto_validate`()
+    NO SQL
+BEGIN
+
+update ctm_bank_transact_validate set
+               budgetid=CASE WHEN bobbylog_bank_transaction_db.isPosted(bank_transact_id)=1 THEN (SELECT budgetid from ctm_auto_validation_registry where auto_validateid=get_autovalidation_status(transactdesc) limit 1) ELSE NULL END,
+               transactaccto= CASE WHEN bobbylog_bank_transaction_db.isPosted(bank_transact_id)=1 THEN (SELECT assigned_budgetid from ctm_auto_validation_registry where auto_validateid=get_autovalidation_status(transactdesc) limit 1) ELSE NULL END,
+               supplier=CASE WHEN bobbylog_bank_transaction_db.isPosted(bank_transact_id)=1 THEN (SELECT assigned_budgetid from ctm_auto_validation_registry where auto_validateid=get_autovalidation_status(transactdesc) limit 1) ELSE NULL END,
+               transactcategory=CASE WHEN bobbylog_bank_transaction_db.isPosted(bank_transact_id)=1 THEN (SELECT assigned_budgetid from ctm_auto_validation_registry where auto_validateid=get_autovalidation_status(transactdesc) limit 1) ELSE NULL END,
+               validation_status=CASE WHEN bobbylog_bank_transaction_db.isPosted(bank_transact_id)=1 THEN 1 ELSE 0 END
+        where get_autovalidation_status(transactdesc) <>0 ;
+
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -7529,9 +7668,12 @@ IF autod=1 THEN
 END IF;
 
 COMMIT;
+call ctm_proc_auto_validate();
 SELECT *, getBudgetTitleFromBudgetId(budgetid) as budgettitle, bobbylog_bank_transaction_db.isPosted(bank_transact_id) as posted,
 bobbylog_bank_transaction_db.getPostedAmount(bank_transact_id) as post_amount,
-DATEDIFF(CURRENT_TIMESTAMP, last_updated) as pduration from ctm_bank_transact_validate order by date_format(str_to_date(transactdate, '%m/%d/%Y'), '%Y-%m-%d') desc;
+DATEDIFF(CURRENT_TIMESTAMP, last_updated) as pduration from ctm_bank_transact_validate order by 
+-- date_format(str_to_date(transactdate, '%m/%d/%Y'), '%Y-%m-%d') desc;
+transactdate desc;
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -7776,7 +7918,7 @@ IF autod=1 THEN
 END IF;
 
 COMMIT;
-
+call ctm_proc_auto_validate();
 set v_nc=FOUND_ROWS(); 
 select v_nc as Affected;
 
@@ -8308,7 +8450,7 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8mb4 */ ;
 /*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'NO_AUTO_VALUE_ON_ZERO' */ ;
+/*!50003 SET sql_mode              = 'NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
 CREATE DEFINER=`bobbylog`@`localhost` PROCEDURE `ctm_proc_profile_tmp_Budget_Info_Approval`(IN `profid` VARCHAR(25), IN `p_PYear` VARCHAR(25), IN `p_PUser` VARCHAR(25))
 BEGIN
@@ -8316,7 +8458,7 @@ BEGIN
      
      IF p_PUser='budgetadmin' THEN
      
-         select b.* from ctm_budget_new b 
+         select b.* ,  (select g.groupname from ctm_group g where g.groupid=AssignedTo limit 1) as AssignedToGroupName from ctm_budget_new b 
          inner join  ctm_fyear c on b.ctyearid=c.ctyearid
          inner join ctm_profile p on p.profileid=c.profileid
          where p.profileid=profid and 
@@ -8344,7 +8486,7 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8mb4 */ ;
 /*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'NO_AUTO_VALUE_ON_ZERO' */ ;
+/*!50003 SET sql_mode              = 'NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
 CREATE DEFINER=`bobbylog`@`localhost` PROCEDURE `ctm_proc_profile_tmp_Budget_Info_Draft`(IN `profid` VARCHAR(25), IN `p_PYear` VARCHAR(25), IN `p_PUser` VARCHAR(25))
 BEGIN
@@ -8352,7 +8494,7 @@ BEGIN
      
      
         
-         select b.* from ctm_budget_new b 
+         select b.* ,  (select g.groupname from ctm_group g where g.groupid=AssignedTo limit 1) as AssignedToGroupName from ctm_budget_new b 
          inner join  ctm_fyear c on b.ctyearid=c.ctyearid
          inner join ctm_profile p on p.profileid=c.profileid
          where p.profileid=profid and 
@@ -8389,7 +8531,7 @@ BEGIN
          
      IF p_PUser='budgetadmin' or CheckAdminStatus='budgetadmins' THEN
      
-         select b.* from ctm_budget_new b 
+         select b.* , (select g.groupname from ctm_group g where g.groupid=AssignedTo limit 1) as AssignedToGroupName from ctm_budget_new b 
          inner join  ctm_fyear c on b.ctyearid=c.ctyearid
          inner join ctm_profile p on p.profileid=c.profileid
          where p.profileid=profid and 
@@ -8401,7 +8543,7 @@ BEGIN
          
         ELSE 
         
-         select b.* from ctm_budget_new b 
+         select b.*,  (select g.groupname from ctm_group g where g.groupid=AssignedTo limit 1) as AssignedToGroupName from ctm_budget_new b 
          inner join  ctm_fyear c on b.ctyearid=c.ctyearid
          inner join ctm_profile p on p.profileid=c.profileid
          where p.profileid=profid and 
@@ -8438,17 +8580,19 @@ BEGIN
     set CheckAdminStatus=checkUserGroupByGrpName(p_PUser,'budgetadmins');
      
       IF p_PUser='budgetadmin' or CheckAdminStatus='budgetadmins' THEN
-         select *, IFNULL(getAllocBalance(AccountNo),0) as AllocBalance, getBalanceAvailableFromBank(Accountid) as bank_bal_avail, getBalanceCurrentFromBank(Accountid) as bank_bal_current 
-         from ctm_funder_q_balance_view
-         where ctyearid=p_PYear;
+         select f.*, IFNULL(getAllocBalance(f.AccountNo),0) as AllocBalance, getBalanceAvailableFromBank(f.Accountid) as bank_bal_avail, getBalanceCurrentFromBank(f.Accountid) as bank_bal_current ,
+         (select count(bf.association_id) as cnt from ctm_bank_funder_association bf where bf.target_funder_name=f.AccountName limit 1) as assoc_ccount
+         from ctm_funder_q_balance_view f
+         where f.ctyearid=p_PYear;
       
        ELSE 
         
-             select *, IFNULL(getAllocBalance(AccountNo),0) as AllocBalance, getBalanceAvailableFromBank(Accountid) as bank_bal_avail, getBalanceCurrentFromBank(Accountid) as bank_bal_current
-           from ctm_funder_q_balance_view
-         where ctyearid=p_PYear
+             select f.*, IFNULL(getAllocBalance(f.AccountNo),0) as AllocBalance, getBalanceAvailableFromBank(f.Accountid) as bank_bal_avail, getBalanceCurrentFromBank(f.Accountid) as bank_bal_currentt ,
+         (select count(bf.association_id) as cnt from ctm_bank_funder_association bf where bf.target_funder_name=f.AccountName limit 1) as assoc_ccount
+           from ctm_funder_q_balance_view f
+         where f.ctyearid=p_PYear
          and
-          Owner=p_PUser;
+         /*(AssignedTo=checkUserGroup(p_PUser, AssignedTo) or */ Owner=p_PUser;
          
          
      END IF;
@@ -8962,8 +9106,8 @@ START TRANSACTION;
 
      UPDATE ctm_budget_new SET
      		Approved=2,
-            ApprovedBy=''
-            
+            ApprovedBy='',
+            bNote=p_PReason
             
      WHERE Budgetid=p_budid;
      
@@ -8993,11 +9137,12 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8mb4 */ ;
 /*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'NO_AUTO_VALUE_ON_ZERO' */ ;
+/*!50003 SET sql_mode              = 'NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
 CREATE DEFINER=`bobbylog`@`localhost` PROCEDURE `ctm_proc_rejecttransact`(IN `p_transid` VARCHAR(25), IN `p_PReason` TEXT, IN `p_POwner` VARCHAR(50))
 BEGIN
-	
+	DECLARE transacct varchar(25);
+    
 START TRANSACTION;
      
     INSERT INTO `ctm_transact_reject_reason` (`ctyearid`, `batchdate`, `transacttype`, `transactdate`, `amount`, `transactaccfrom`, `transactaccto`, `transactdesc`, `transactnote`, `rejectdate`, `rejectreason`, `rejectedby`)
@@ -9007,8 +9152,10 @@ START TRANSACTION;
       INSERT INTO `ctm_mail_message` (`fromsender`, `tosender`, `subject`, `message`, `datesent`, `mailstatus`) VALUES ('noreply@serpaone.com', getBudgetFollowrersFromTransID(p_transid),'Transaction is rejected',
 concat('Your transaction in the amount of ', getTransactAmount(p_transid), ' from account ',getTransactAccName(p_transid),' of budget ', getTransactAccBudgetName(p_transid), ' has been rejected by the budget administrator for the following reason: ',p_PReason, '.') ,CURRENT_TIMESTAMP(), '0');
 
- 
+    SET transacct=(SELECT transactaccto from ctm_transact_batch where batchid=p_transid limit 1);
     update ctm_transact_batch set processed=2 WHERE batchid=p_transid;
+    delete from _tmp_account_new where AccountNo=transacct;
+    delete from _tmp_funder_new where AccountNo=transacct;
     
      
 COMMIT;
@@ -9221,6 +9368,104 @@ set v_nc=FOUND_ROWS();
 select v_nc as Affected;
 
 
+
+
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `ctm_proc_report_event` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`setienne`@`localhost` PROCEDURE `ctm_proc_report_event`(IN `p_Pevttype` VARCHAR(25))
+    NO SQL
+BEGIN
+
+DECLARE v_nc int;
+DECLARE autod int;
+DECLARE dnum int;
+DECLARE rnum int;
+DECLARE wstat int;
+DECLARE dload int;
+DECLARE rcur int;
+DECLARE rdate date;
+DECLARE initdate date;
+
+set wstat=(SELECT count(witnessid) from ctm_event_witness limit 1);
+
+
+
+IF (wstat=0) THEN
+   INSERT INTO ctm_event_witness(eventid, dload_witness,rcur_witness,rundate) VALUES(0,0,0,CURRENT_DATE);
+END IF;
+
+
+SET initdate=(SELECT rundate from ctm_event_witness limit 1);
+set dload=(SELECT dload_witness from ctm_event_witness limit 1);
+set rcur=(SELECT rcur_witness from ctm_event_witness limit 1);
+
+SET dnum=(SELECT count(bank_transact_id) FROM ctm_bank_transact_validate where cast(transactdate as DATE)=CURRENT_DATE limit 1);
+SET rnum=(SELECT count(batchid) FROM ctm_transact_batch where cast(transactdate as DATE)=CURRENT_DATE limit 1);
+        
+
+IF (dload=1 and initdate<>CURRENT_DATE) THEN
+     update ctm_event_witness set
+     dload_witness=0,
+     rundate=CURRENT_DATE; 
+     set dload=0;
+END IF;
+
+IF (rcur=1 and initdate<>CURRENT_DATE) THEN
+     update ctm_event_witness set
+     rcur_witness=0,
+     rundate=CURRENT_DATE; 
+     set rcur=0;
+END IF;
+
+IF (p_Pevttype='Download') THEN
+     IF (dload=0 AND initdate=CURRENT_DATE) THEN
+       
+        if dnum>0 THEN          
+        INSERT INTO ctm_event_log(eventname,eventtype,event_description,event_ref_module, eventstatus)
+        VALUES('Download','DOWNLOAD', CONCAT(dnum, ' new bank transaction(s) have been downloaded today.') , 'download_events','New');
+                                                                                                                         
+        update ctm_event_witness set dload_witness=1,rundate=CURRENT_DATE;                     
+        
+        END IF;                     
+       
+    END IF;
+
+END IF;
+
+
+    
+IF  (p_Pevttype='Recurring') THEN
+	IF (rcur=0 AND initdate=CURRENT_DATE) THEN
+      
+      if rnum>0 THEN            
+        INSERT INTO ctm_event_log(eventname,eventtype,event_description,event_ref_module, eventstatus)
+        VALUES('Recurring Transfer','RECURRING TRANSFER', CONCAT(rnum, ' new recurring transactions are in pending review status.') , 'recurring_events','New');
+     
+                                                                                                                          
+        update ctm_event_witness set rcur_witness=1,rundate=CURRENT_DATE;                                           
+       END IF;                       
+       
+    END IF;
+    
+END IF;
+
+
+set v_nc=FOUND_ROWS(); 
+select v_nc as Affected;
 
 
 END ;;
@@ -9569,9 +9814,9 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8mb4 */ ;
 /*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'NO_AUTO_VALUE_ON_ZERO' */ ;
+/*!50003 SET sql_mode              = 'NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`bobbylog`@`localhost` PROCEDURE `ctm_proc_submitbudget_new`(IN `p_budid` VARCHAR(25), IN `p_PUser` VARCHAR(25))
+CREATE DEFINER=`bobbylog`@`localhost` PROCEDURE `ctm_proc_submitbudget_new`(IN `p_budid` VARCHAR(25), IN `p_PUser` VARCHAR(50))
 BEGIN
 	
 START TRANSACTION;
@@ -10706,9 +10951,9 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8mb4 */ ;
 /*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'NO_AUTO_VALUE_ON_ZERO' */ ;
+/*!50003 SET sql_mode              = 'NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`bobbylog`@`localhost` PROCEDURE `ctm_updateBudget`(IN `p_PBudid` VARCHAR(50), IN `p_PSource` VARCHAR(50), IN `p_PScrType` VARCHAR(50), IN `p_PTitle` VARCHAR(350), IN `p_PType` VARCHAR(25), IN `p_PStatus` VARCHAR(25), IN `p_PPlan` VARCHAR(25), IN `p_PAssign` VARCHAR(50), IN `p_PVision` TEXT, IN `p_PFYear` VARCHAR(25), IN `p_PGroup` VARCHAR(50), IN `p_PCode` VARCHAR(50), IN `p_POwner` VARCHAR(50), IN `p_PStartd` VARCHAR(25), IN `p_PFollow` TEXT, IN `p_PUser` VARCHAR(50))
+CREATE DEFINER=`bobbylog`@`localhost` PROCEDURE `ctm_updateBudget`(IN `p_PBudid` VARCHAR(50), IN `p_PSource` VARCHAR(50), IN `p_PScrType` VARCHAR(50), IN `p_PTitle` VARCHAR(350), IN `p_PType` VARCHAR(25), IN `p_PStatus` VARCHAR(25), IN `p_PNote` TEXT, IN `p_PAssign` VARCHAR(50), IN `p_PVision` TEXT, IN `p_PFYear` VARCHAR(25), IN `p_PGroup` VARCHAR(50), IN `p_PCode` VARCHAR(50), IN `p_POwner` VARCHAR(50), IN `p_PStartd` VARCHAR(25), IN `p_PFollow` TEXT, IN `p_PUser` VARCHAR(50))
 BEGIN
 			
 	DECLARE v_nc int;
@@ -10723,7 +10968,7 @@ BEGIN
 						Source=p_PSource,
 						title=p_PTitle,
 						accStatus=p_PStatus,
-						bNote='NA',
+						bNote=p_PNote,
                         AssignedTo=p_PAssign,
                         Vision=p_PVision,
                         FYear=p_PFYear,
@@ -11738,4 +11983,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-03-17  0:55:11
+-- Dump completed on 2022-04-14  0:44:29
